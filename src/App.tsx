@@ -1,23 +1,7 @@
 // src/App.tsx
 import { useState } from "react";
-
-interface Ingredient {  // 大文字始まりが慣習
-  name: string;
-  quantity: string;
-}
-
-interface MenuItem {
-  day: string;          // ← ここに移動
-  title: string;
-  ingredients: Ingredient[];
-  cost: number;
-}
-
-interface MenuResponse {
-  menus: MenuItem[];
-  shoppingList: string[];
-  totalCost: number;
-}
+import type { MenuResponse, MenuItem, Ingredient } from "./types/menu";
+import TotalCost from "./components/TotalCost";
 
 export default function App() {
   const [adults, setAdults] = useState(2);
@@ -291,17 +275,7 @@ const validateInput = (): string | null => {
                       </ul>
                     </div>
                   </div>
-
-                  {/* 合計金額 */}
-                  <div>
-                    <h2 className="text-2xl font-bold">合計金額</h2>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md text-center">
-                      <p className="text-3xl font-bold text-accent">
-                        ¥{response.totalCost.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-2">3日分の合計</p>
-                    </div>
-                  </div>
+                  <TotalCost totalCost={response.totalCost} />
                 </div>
               )}
               </div>
