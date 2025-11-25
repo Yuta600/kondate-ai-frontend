@@ -1,10 +1,10 @@
-export interface Ingredient {  // 大文字始まりが慣習
+export interface Ingredient {
   name: string;
   quantity: string;
 }
 
 export interface MenuItem {
-  day: string;          // ← ここに移動
+  day: string;
   title: string;
   ingredients: Ingredient[];
   cost: number;
