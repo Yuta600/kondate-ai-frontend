@@ -1,8 +1,9 @@
 // src/App.tsx
 import { useState } from "react";
-import type { MenuResponse, MenuItem, Ingredient } from "./types/menu";
+import type { MenuResponse } from "./types/menu";
 import TotalCost from "./components/TotalCost";
 import MenuCard from "./components/MenuCard";
+import ShoppingList from "./components/ShoppingList";
 
 export default function App() {
   const [adults, setAdults] = useState(2);
@@ -13,34 +14,31 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<MenuResponse | null>(null);
-  const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
 
+  const validateInput = (): string | null => {
+    if (adults + children < 1) {
+      return "家族構成は一人以上必要です。";
+    }
 
-const validateInput = (): string | null => {
-  if (adults + children < 1) {
-    return "家族構成は一人以上必要です。";
-  }
+    if (postalCode.length !== 7) {
+      return "郵便番号は7桁で入力してください。";
+    }
+    if (!/^[0-9]+$/.test(postalCode)) {
+      return "郵便番号は数字のみで入力してください。";
+    }
 
-  if (postalCode.length !== 7) {
-    return "郵便番号は7桁で入力してください。";
-  }
-  if (!/^[0-9]+$/.test(postalCode)) {
-    return "郵便番号は数字のみで入力してください。";
-  }
+    if (!supermarket.trim()) {
+      return "スーパー名を入力してください。";
+    }
 
-  if (!supermarket.trim()) {
-    return "スーパー名を入力してください。";
-  }
+    if (budget === "" || budget <= 0) {
+      return "予算を入力してください。";
+    }
 
-  if (budget === "" || budget <= 0) {
-    return "予算を入力してください。";
-  }
-
-  return null;
-}
+    return null;
+  };
 
   const handleSubmit = async () => {
-
     setError(null);
 
     const errorMessage = validateInput();
@@ -55,15 +53,15 @@ const validateInput = (): string | null => {
       const response = await fetch("http://localhost:8080/api/menu/generate", {
         method: "POST",
         headers: {
-          "Content-type": "application/json"
+          "Content-type": "application/json",
         },
         body: JSON.stringify({
           adults,
           children,
           postalCode,
-          supermarketName:supermarket,
-          budget
-        })
+          supermarketName: supermarket,
+          budget,
+        }),
       });
 
       // ステータスコードをチェック
@@ -80,7 +78,6 @@ const validateInput = (): string | null => {
     } finally {
       setIsLoading(false);
     }
-
   };
 
   return (
@@ -91,7 +88,9 @@ const validateInput = (): string | null => {
             <header className="flex items-center justify-center whitespace-nowrap border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 md:px-10 py-4">
               <div className="flex items-center gap-3">
                 <div className="text-primary text-3xl">
-                  <span className="material-symbols-outlined">restaurant_menu</span>
+                  <span className="material-symbols-outlined">
+                    restaurant_menu
+                  </span>
                 </div>
                 <h1 className="text-text-light dark:text-text-dark text-xl font-bold tracking-tight">
                   AIおまかせ献立プランナー
@@ -118,7 +117,10 @@ const validateInput = (): string | null => {
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex flex-col">
-                        <label className="text-base font-medium pb-2" htmlFor="adults">
+                        <label
+                          className="text-base font-medium pb-2"
+                          htmlFor="adults"
+                        >
                           大人
                         </label>
                         <input
@@ -130,7 +132,10 @@ const validateInput = (): string | null => {
                         />
                       </div>
                       <div className="flex flex-col">
-                        <label className="text-base font-medium pb-2" htmlFor="children">
+                        <label
+                          className="text-base font-medium pb-2"
+                          htmlFor="children"
+                        >
                           子供
                         </label>
                         <input
@@ -149,7 +154,7 @@ const validateInput = (): string | null => {
                     <h2 className="text-text-light dark:text-text-dark text-lg font-bold tracking-tight">
                       お住まいのエリア（郵便番号）
                     </h2>
-                    <input 
+                    <input
                       type="text"
                       className="form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal"
                       placeholder="1000001 (皇居の例)"
@@ -157,7 +162,7 @@ const validateInput = (): string | null => {
                       onChange={(e) => setPostalCode(e.target.value)}
                       pattern="[0-9]{7}"
                       maxLength={7}
-                       />
+                    />
                   </div>
 
                   {/* スーパー */}
@@ -187,10 +192,14 @@ const validateInput = (): string | null => {
                         placeholder="例：1.5"
                         value={budget}
                         onChange={(e) =>
-                          setBudget(e.target.value ? Number(e.target.value) : "")
+                          setBudget(
+                            e.target.value ? Number(e.target.value) : ""
+                          )
                         }
                       />
-                      <span className="absolute right-4 text-gray-400">万円</span>
+                      <span className="absolute right-4 text-gray-400">
+                        万円
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -198,7 +207,7 @@ const validateInput = (): string | null => {
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
                     {error}
                   </div>
-              )}
+                )}
                 <div className="pt-8 text-center">
                   <button
                     className="bg-accent hover:bg-accent/90 text-white font-bold py-4 px-8 rounded-xl w-full max-w-md mx-auto text-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 dark:focus:ring-offset-background-dark disabled:opacity-50 disabled:cursor-not-allowed"
@@ -209,51 +218,22 @@ const validateInput = (): string | null => {
                   </button>
                 </div>
                 {response && (
-                <div className="mt-12 space-y-8">
-                  {/* 献立一覧 */}
-                  <div>
-                    <h2 className="text-2xl font-bold mb-6">3日分の献立</h2>
-                    <div className="space-y-6">
-                      {response.menus.map((menu, index) => (
-                        <MenuCard key={index} menu={menu} />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 買い物リスト */}
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4">買い物リスト</h2>
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
-                      <ul className="space-y-2">
-                        {response.shoppingList.map((item, index) => (
-                          <li key={index} className="flex items-center gap-3">
-                            <input
-                              type="checkbox"
-                              id={`item-${index}`}
-                              checked={checkedItems[index] || false}
-                              onChange={(e) => {
-                                const newChecked = [...checkedItems];
-                                newChecked[index] = e.target.checked;
-                                setCheckedItems(newChecked);
-                              }}
-                              className="w-5 h-5 rounded border-gray-300"
-                            />
-                            <label
-                              htmlFor={`item-${index}`}
-                              className={`flex-1 cursor-pointer ${
-                                checkedItems[index] ? "line-through text-gray-400" : ""
-                              }`}
-                            >
-                              {item}
-                            </label>
-                          </li>
+                  <div className="mt-12 space-y-8">
+                    {/* 献立一覧 */}
+                    <div>
+                      <h2 className="text-2xl font-bold mb-6">3日分の献立</h2>
+                      <div className="space-y-6">
+                        {response.menus.map((menu, index) => (
+                          <MenuCard key={index} menu={menu} />
                         ))}
-                      </ul>
+                      </div>
                     </div>
+
+                    {/* 買い物リスト */}
+                    <ShoppingList items={response.shoppingList} />
+                    <TotalCost totalCost={response.totalCost} />
                   </div>
-                  <TotalCost totalCost={response.totalCost} />
-                </div>
-              )}
+                )}
               </div>
             </main>
           </div>
