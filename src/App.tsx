@@ -1,10 +1,7 @@
-// src/App.tsx
 import { useState } from "react";
 import type { MenuResponse } from "./types/menu";
-import TotalCost from "./components/TotalCost";
-import MenuCard from "./components/MenuCard";
-import ShoppingList from "./components/ShoppingList";
 import InputForm from "./components/InputForm";
+import MenuResult from "./components/MenuResult";
 
 export default function App() {
   const [adults, setAdults] = useState(2);
@@ -115,23 +112,7 @@ export default function App() {
                 isLoading={isLoading}
                 onSubmit={handleSubmit}
               />
-              {response && (
-                <div className="mt-12 space-y-8">
-                  {/* 献立一覧 */}
-                  <div>
-                    <h2 className="text-2xl font-bold mb-6">3日分の献立</h2>
-                    <div className="space-y-6">
-                      {response.menus.map((menu, index) => (
-                        <MenuCard key={index} menu={menu} />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 買い物リスト */}
-                  <ShoppingList items={response.shoppingList} />
-                  <TotalCost totalCost={response.totalCost} />
-                </div>
-              )}
+              {response && <MenuResult response={response} />}
             </main>
           </div>
         </div>
