@@ -1,3 +1,4 @@
+import type { ValidationErrors } from "../App";
 export interface InputFormProps {
   adults: number;
   setAdults: (value: number) => void;
@@ -9,7 +10,8 @@ export interface InputFormProps {
   setSupermarket: (value: string) => void;
   budget: number | "";
   setBudget: (value: number | "") => void;
-  error: string | null;
+  errors: ValidationErrors;
+  apiError: string | null;
   isLoading: boolean;
   onSubmit: () => void;
 }
@@ -26,7 +28,8 @@ export default function InputForm(props: InputFormProps) {
     setSupermarket,
     budget,
     setBudget,
-    error,
+    errors,
+    apiError,
     isLoading,
     onSubmit,
   } = props;
@@ -54,7 +57,7 @@ export default function InputForm(props: InputFormProps) {
                 大人
               </label>
               <input
-                className="form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal"
+                className={`form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal ${errors.family ? "border-red-500" : ""}`}
                 id="adults"
                 type="number"
                 value={adults}
@@ -66,7 +69,7 @@ export default function InputForm(props: InputFormProps) {
                 子供
               </label>
               <input
-                className="form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal"
+                className={`form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal ${errors.family ? "border-red-500" : ""}`}
                 id="children"
                 type="number"
                 value={children}
@@ -74,6 +77,22 @@ export default function InputForm(props: InputFormProps) {
               />
             </div>
           </div>
+          {errors.family && (
+            <div className="flex items-start gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <svg
+                className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-red-700 text-sm">{errors.family}</p>
+            </div>
+          )}
         </div>
 
         {/* 住まいのエリア */}
@@ -83,13 +102,29 @@ export default function InputForm(props: InputFormProps) {
           </h2>
           <input
             type="text"
-            className="form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal"
+            className={`form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal ${errors.postalCode ? "border-red-500" : ""}`}
             placeholder="1000001 (皇居の例)"
             value={postalCode}
             onChange={(e) => setPostalCode(e.target.value)}
             pattern="[0-9]{7}"
             maxLength={7}
           />
+          {errors.postalCode && (
+            <div className="flex items-start gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <svg
+                className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-red-700 text-sm">{errors.postalCode}</p>
+            </div>
+          )}
         </div>
 
         {/* スーパー */}
@@ -98,11 +133,27 @@ export default function InputForm(props: InputFormProps) {
             よく利用するスーパー
           </h2>
           <input
-            className="form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal"
+            className={`form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal ${errors.supermarket ? "border-red-500" : ""}`}
             placeholder="例：〇〇スーパー、XXストア"
             value={supermarket}
             onChange={(e) => setSupermarket(e.target.value)}
           />
+          {errors.supermarket && (
+            <div className="flex items-start gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <svg
+                className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-red-700 text-sm">{errors.supermarket}</p>
+            </div>
+          )}
         </div>
 
         {/* 食費 */}
@@ -113,7 +164,7 @@ export default function InputForm(props: InputFormProps) {
           <div className="relative flex items-center w-full sm:w-1/2">
             <span className="absolute left-4 text-gray-400">¥</span>
             <input
-              className="form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 pl-8 pr-4 text-base font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className={`form-input-custom flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg h-14 pl-8 pr-4 text-base font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${errors.budget ? "border-red-500" : ""}`}
               type="number"
               step={0.1}
               placeholder="例：1.5"
@@ -124,11 +175,27 @@ export default function InputForm(props: InputFormProps) {
             />
             <span className="absolute right-4 text-gray-400">万円</span>
           </div>
+          {errors.budget && (
+            <div className="flex items-start gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <svg
+                className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-red-700 text-sm">{errors.budget}</p>
+            </div>
+          )}
         </div>
       </div>
-      {error && (
+      {apiError && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-          {error}
+          {apiError}
         </div>
       )}
       <div className="pt-8 text-center">

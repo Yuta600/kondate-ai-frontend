@@ -3,6 +3,15 @@ import type { MenuResponse } from "./types/menu";
 import InputForm from "./components/InputForm";
 import MenuResult from "./components/MenuResult";
 
+type ErrorField =
+  | "family"
+  | "children"
+  | "postalCode"
+  | "supermarket"
+  | "budget";
+
+export type ValidationErrors = Partial<Record<ErrorField, string>>;
+
 export default function App() {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(1);
@@ -10,38 +19,39 @@ export default function App() {
   const [supermarket, setSupermarket] = useState("");
   const [budget, setBudget] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [apiError, setApiError] = useState<string | null>(null);
   const [response, setResponse] = useState<MenuResponse | null>(null);
 
-  const validateInput = (): string | null => {
+  const validateInput = (): ValidationErrors => {
+    const errors: ValidationErrors = {};
+
     if (adults + children < 1) {
-      return "家族構成は一人以上必要です。";
+      errors.family = "家族構成は一人以上必要です。";
     }
 
-    if (postalCode.length !== 7) {
-      return "郵便番号は7桁で入力してください。";
-    }
-    if (!/^[0-9]+$/.test(postalCode)) {
-      return "郵便番号は数字のみで入力してください。";
+    if (postalCode.length !== 7 || !/^[0-9]+$/.test(postalCode)) {
+      errors.postalCode = "郵便番号は7桁の数字で入力してください。";
     }
 
     if (!supermarket.trim()) {
-      return "スーパー名を入力してください。";
+      errors.supermarket = "スーパー名を入力してください。";
     }
 
     if (budget === "" || budget <= 0) {
-      return "予算を入力してください。";
+      errors.budget = "予算を入力してください。";
     }
 
-    return null;
+    return errors;
   };
 
   const handleSubmit = async () => {
-    setError(null);
+    setErrors({});
+    setApiError(null);
 
-    const errorMessage = validateInput();
-    if (errorMessage) {
-      setError(errorMessage);
+    const validationErrors = validateInput();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -72,7 +82,7 @@ export default function App() {
       console.log("受信データ:", data);
     } catch (error) {
       console.error("API Error:", error);
-      setError("献立の生成に失敗しました。");
+      setApiError("献立の生成に失敗しました。");
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +118,8 @@ export default function App() {
                 setSupermarket={setSupermarket}
                 budget={budget}
                 setBudget={setBudget}
-                error={error}
+                errors={errors}
+                apiError={apiError}
                 isLoading={isLoading}
                 onSubmit={handleSubmit}
               />
