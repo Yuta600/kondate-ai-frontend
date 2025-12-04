@@ -22,6 +22,7 @@ export default function App() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [apiError, setApiError] = useState<string | null>(null);
   const [response, setResponse] = useState<MenuResponse | null>(null);
+  const [address, setAddress] = useState<string>("");
 
   const validateInput = (): ValidationErrors => {
     const errors: ValidationErrors = {};
@@ -88,6 +89,29 @@ export default function App() {
     }
   };
 
+  const handlePostalCodeBlur = async () => {
+    if (postalCode.length !== 7) {
+      setAddress("");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://postcode.teraren.com/postcodes/${postalCode}.json`,
+      );
+
+      if (!response.ok) {
+        setAddress("");
+        return;
+      }
+      const data = await response.json();
+      setAddress(`${data.prefecture}${data.city}${data.suburb}`);
+    } catch (error) {
+      console.error("郵便番号API取得エラー:", error);
+      setAddress("");
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
       <div className="layout-container flex h-full grow flex-col">
@@ -114,6 +138,7 @@ export default function App() {
                 setChildren={setChildren}
                 postalCode={postalCode}
                 setPostalCode={setPostalCode}
+                address={address}
                 supermarket={supermarket}
                 setSupermarket={setSupermarket}
                 budget={budget}
@@ -122,6 +147,7 @@ export default function App() {
                 apiError={apiError}
                 isLoading={isLoading}
                 onSubmit={handleSubmit}
+                onPostalCodeBlur={handlePostalCodeBlur}
               />
               {response && <MenuResult response={response} />}
             </main>

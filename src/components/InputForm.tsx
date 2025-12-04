@@ -6,6 +6,7 @@ export interface InputFormProps {
   setChildren: (value: number) => void;
   postalCode: string;
   setPostalCode: (value: string) => void;
+  address: string;
   supermarket: string;
   setSupermarket: (value: string) => void;
   budget: number | "";
@@ -14,6 +15,7 @@ export interface InputFormProps {
   apiError: string | null;
   isLoading: boolean;
   onSubmit: () => void;
+  onPostalCodeBlur: () => void;
 }
 
 export default function InputForm(props: InputFormProps) {
@@ -24,6 +26,7 @@ export default function InputForm(props: InputFormProps) {
     setChildren,
     postalCode,
     setPostalCode,
+    address,
     supermarket,
     setSupermarket,
     budget,
@@ -32,6 +35,7 @@ export default function InputForm(props: InputFormProps) {
     apiError,
     isLoading,
     onSubmit,
+    onPostalCodeBlur,
   } = props;
 
   return (
@@ -106,9 +110,21 @@ export default function InputForm(props: InputFormProps) {
             placeholder="1000001 (皇居の例)"
             value={postalCode}
             onChange={(e) => setPostalCode(e.target.value)}
+            onBlur={() => onPostalCodeBlur()}
             pattern="[0-9]{7}"
             maxLength={7}
           />
+          {address && (
+            <p
+              className={`text-sm mt-2 ${
+                address === "存在しない郵便番号です"
+                  ? "text-red-600"
+                  : "text-gray-600"
+              }`}
+            >
+              {address}
+            </p>
+          )}
           {errors.postalCode && (
             <div className="flex items-start gap-2 mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
               <svg
